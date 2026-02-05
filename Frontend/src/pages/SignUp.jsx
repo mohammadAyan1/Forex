@@ -59,7 +59,7 @@ const SignUp = () => {
       // ✅ store email for verification
       localStorage.setItem("verify_email", formData.email);
 
-      navigate("/verify-email");
+      navigate("/login");
     } catch (error) {
       console.error(error);
       alert("Something went wrong");
@@ -122,58 +122,58 @@ const SignUp = () => {
           </button>
         </div>
 
-<div className="space-y-5">
-  {/* PAN Card */}
-  <div>
-    <label className="block text-sm font-medium text-gray-300 mb-1">
-      Upload PAN Card
-    </label>
-    <input
-      type="file"
-      onChange={(e) => setPanImage(e.target.files[0])}
-      className="w-full text-sm text-gray-500
+        <div className="space-y-5">
+          {/* PAN Card */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              Upload PAN Card
+            </label>
+            <input
+              type="file"
+              onChange={(e) => setPanImage(e.target.files[0])}
+              className="w-full text-sm text-gray-500
                  file:mr-4 file:py-2 file:px-4
                  file:rounded-lg file:border-0
                  file:text-sm file:font-semibold
                  file:bg-purple-50 file:text-purple-700
                  hover:file:bg-purple-100"
-    />
-  </div>
+            />
+          </div>
 
-  {/* Aadhaar Card */}
-  <div>
-    <label className="block text-sm font-medium text-gray-300 mb-1">
-      Upload Aadhaar Card
-    </label>
-    <input
-      type="file"
-      onChange={(e) => setAadhaarImage(e.target.files[0])}
-      className="w-full text-sm text-gray-500
+          {/* Aadhaar Card */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              Upload Aadhaar Card
+            </label>
+            <input
+              type="file"
+              onChange={(e) => setAadhaarImage(e.target.files[0])}
+              className="w-full text-sm text-gray-500
                  file:mr-4 file:py-2 file:px-4
                  file:rounded-lg file:border-0
                  file:text-sm file:font-semibold
                  file:bg-purple-50 file:text-purple-700
                  hover:file:bg-purple-100"
-    />
-  </div>
+            />
+          </div>
 
-  {/* Bank Passbook */}
-  <div>
-    <label className="block text-sm font-medium text-gray-300 mb-1">
-      Upload Bank Passbook / Cancelled Cheque
-    </label>
-    <input
-      type="file"
-      onChange={(e) => setBankPassbookImage(e.target.files[0])}
-      className="w-full text-sm text-gray-500
+          {/* Bank Passbook */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              Upload Bank Passbook / Cancelled Cheque
+            </label>
+            <input
+              type="file"
+              onChange={(e) => setBankPassbookImage(e.target.files[0])}
+              className="w-full text-sm text-gray-500
                  file:mr-4 file:py-2 file:px-4
                  file:rounded-lg file:border-0
                  file:text-sm file:font-semibold
                  file:bg-purple-50 file:text-purple-700
                  hover:file:bg-purple-100"
-    />
-  </div>
-</div>
+            />
+          </div>
+        </div>
 
 
         <button onClick={handleRegister}

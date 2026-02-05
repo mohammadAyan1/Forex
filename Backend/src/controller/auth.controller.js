@@ -210,8 +210,8 @@ export const register = async (req, res) => {
     const [userResult] = await connection.execute(
       `
       INSERT INTO users
-      (name, email, mobile, password, otp, otp_time_limit)
-      VALUES (?, ?, ?, ?, ?, ?)
+      (name, email, mobile, password, otp, otp_time_limit,is_verified)
+      VALUES (?, ?, ?, ?, ?, ?,1)
       `,
       [name, email, mobile, hashedPassword, otp, otpExpiryTime]
     );
@@ -253,18 +253,18 @@ export const register = async (req, res) => {
     await connection.commit();
 
     // 📧 Send OTP (after commit ✅ best practice)
-    await sendOTPEmail(
-      email,
-      "Email Verification OTP",
-      `<h2>Email Verification</h2>
-      <h1>${otp}</h1>
-      <p>OTP valid for 5 minutes</p>
-      `
-    );
+    // await sendOTPEmail(
+    //   email,
+    //   "Email Verification OTP",
+    //   `<h2>Email Verification</h2>
+    //   <h1>${otp}</h1>
+    //   <p>OTP valid for 5 minutes</p>
+    //   `
+    // );
 
     return res.status(201).json({
       success: true,
-      message: "Registered successfully. OTP sent.",
+      message: "Registered successfully. Please Wait For Admin Verification Then You Can Login.",
     });
   } catch (error) {
     await connection.rollback(); // ✅ rollback on connection

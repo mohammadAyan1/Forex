@@ -92,14 +92,14 @@ const Login = () => {
           </button>
         </div>
 
-        <div className="text-left mb-6">
+        {/* <div className="text-left mb-6">
           <Link
             to="/forgot-password"
             className="text-crypto-purple text-sm hover:text-white transition"
           >
             Forgot Password ?
           </Link>
-        </div>
+        </div> */}
 
         <button
           onClick={handleLogin}
