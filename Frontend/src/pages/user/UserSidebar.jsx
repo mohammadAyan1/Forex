@@ -71,17 +71,19 @@ import { toast } from "react-toastify";
 import { useState } from "react";
 
 const menuItems = [
-  { name: "Watchlist", icon: <Eye size={18} />, path: "/user/watchlist" },
-  { name: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/user/dashboard" },
-  { name: "Edit Profile", icon: <User size={18} />, path: "/user/account-setting" },
-  { name: "Invest Money", icon: <Wallet size={18} />, path: "/user/invest" },
-  { name: "Withdraw Money", icon: <ArrowDownCircle size={18} />, path: "/user/withdraw" },
-  { name: "Transaction", icon: <List size={18} />, path: "/user/transaction" },
-  { name: "Order History", icon: <List size={18} />, path: "/user/order-history" },
+  { name: "Watchlist", icon: <Eye size={18} />, path: "/user/watchlist", newTab: true, },
+  { name: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/user/dashboard", newTab: true, },
+  { name: "Edit Profile", icon: <User size={18} />, path: "/user/account-setting", newTab: true, },
+  { name: "Invest Money", icon: <Wallet size={18} />, path: "/user/invest", newTab: true, },
+  { name: "Withdraw Money", icon: <ArrowDownCircle size={18} />, path: "/user/withdraw", newTab: true, },
+  { name: "Transaction", icon: <List size={18} />, path: "/user/transaction", newTab: true, },
+  { name: "Order History", icon: <List size={18} />, path: "/user/order-history", newTab: true, },
 ];
 
 const UserSidebar = ({ isOpen }) => {
   const navigate = useNavigate();
+
+  
   const [loadingLogout, setLoadingLogout] = useState(false);
 
   const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
@@ -122,8 +124,8 @@ const UserSidebar = ({ isOpen }) => {
       transform ${isOpen ? "translate-x-0" : "-translate-x-full"} 
       lg:translate-x-0 transition-transform duration-300`}
     >
-      <div className="p-4 font-bold text-lg border-b border-white/10">
-        Forex Trading
+      <div className="p-4 font-bold text-lg border-b border-white/10 text-center">
+        Welcome !
       </div>
 
       <nav className="p-4 space-y-2">
@@ -131,6 +133,8 @@ const UserSidebar = ({ isOpen }) => {
           <NavLink
             key={item.name}
             to={item.path}
+              target={item.newTab ? "_blank" : undefined}
+  rel={item.newTab ? "noopener noreferrer" : undefined}
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-3 rounded-lg transition
               ${

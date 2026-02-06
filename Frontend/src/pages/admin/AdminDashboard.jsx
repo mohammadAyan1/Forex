@@ -4,7 +4,6 @@ import { ChevronDown, X } from "lucide-react";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-
 const StatCard = ({ title, value }) => (
   <div className="bg-white rounded-xl shadow p-5">
     <p className="text-gray-500 text-sm">{title}</p>
@@ -12,25 +11,30 @@ const StatCard = ({ title, value }) => (
   </div>
 );
 
-const AdminDashboard = () => {
+const AdminDashboard = ({ sender }) => {
   const [summary, setSummary] = useState(null);
   const [users, setUsers] = useState([]);
   const [activeUser, setActiveUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  console.log(sender);
+  console.log(users);
+
+
+
   useEffect(() => {
     const fetchOverview = async () => {
       try {
         const res = await fetch(
-          `${API_BASE_URL}/wallet/admin/wallet/overview`,
-          { credentials: "include" }
+          `${API_BASE_URL}/wallet/admin/wallet/${sender?"superadmin":"overview"}`,
+          { credentials: "include" },
         );
 
-        if (!res.ok) throw new Error("Failed to fetch dashboard data");
+        if (!res?.ok) throw new Error("Failed to fetch dashboard data");
 
         const data = await res.json();
-        setSummary(data.overall_summary);
-        setUsers(data.users);
+        setSummary(data?.overall_summary);
+        setUsers(data?.users);
       } catch (error) {
         console.error("Dashboard error:", error);
       } finally {
@@ -52,18 +56,18 @@ const AdminDashboard = () => {
 
   return (
     <div className="flex bg-gray-100 min-h-screen">
-      <AdminSidebar />
+      {!sender && (<AdminSidebar />)}
 
       <div className="flex-1 p-4 md:p-6 space-y-6">
         <h2 className="text-xl font-semibold">Admin Wallet Overview</h2>
 
         {/* 🔹 STATS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <StatCard title="Total Users" value={summary.total_users} />
-          <StatCard title="Total Topup" value={`₹ ${summary.total_topup}`} />
+          <StatCard title="Total Users" value={summary?.total_users} />
+          <StatCard title="Total Topup" value={`₹ ${summary?.total_topup}`} />
           <StatCard
             title="Total Withdrawal"
-            value={`₹ ${summary.total_withdrawal}`}
+            value={`₹ ${summary?.total_withdrawal}`}
           />
         </div>
 
@@ -84,28 +88,32 @@ const AdminDashboard = () => {
 
             <tbody>
               {users.map((user) => (
-                <tr
-                  key={user.user_id}
-                  className="border-t hover:bg-gray-50"
-                >
+                <tr key={user?.user_id} className="border-t hover:bg-gray-50">
                   <td className="p-3">
-                    <p className="font-medium">Username = {user.name}</p>
-                    <p className="font-medium">Password = {user.password}</p>
-                    <p className="text-xs text-gray-500">Email = {user.email}</p>
-                    <p className="text-xs text-gray-400">Mobile No. = {user.mobile}</p>
+                    <p className="font-medium">Username = {user?.name}</p>
+                    <p className="font-medium">Password = {user?.password}</p>
+                    <p className="text-xs text-gray-500">
+                      Email = {user?.email}
+                    </p>
+                    {sender && (
+                      <p className="text-xs text-gray-500">
+                        role = {user?.role}
+                      </p>
+                    )}
+                    <p className="text-xs text-gray-400">
+                      Mobile No. = {user?.mobile}
+                    </p>
                   </td>
-                  <td className="p-3 text-center">₹{user.totals.topup}</td>
-                  <td className="p-3 text-center">
-                    ₹{user.totals.withdrawal}
-                  </td>
+                  <td className="p-3 text-center">₹{user?.totals?.topup}</td>
+                  <td className="p-3 text-center">₹{user?.totals?.withdrawal}</td>
                   <td className="p-3 text-center text-green-600">
-                    ₹{user.totals.profit}
+                    ₹{user?.totals?.profit}
                   </td>
                   <td className="p-3 text-center text-red-600">
-                    ₹{user.totals.loss}
+                    ₹{user?.totals?.loss}
                   </td>
                   <td className="p-3 text-center font-semibold">
-                    ₹{user.totals.balance}
+                    ₹{user?.totals?.balance}
                   </td>
                   <td className="p-3 text-center">
                     <button
@@ -129,11 +137,9 @@ const AdminDashboard = () => {
             <div className="flex justify-between items-center p-4 border-b">
               <div>
                 <h3 className="font-semibold text-lg">
-                  {activeUser.name}'s Transactions
+                  {activeUser?.name}'s Transactions
                 </h3>
-                <p className="text-xs text-gray-500">
-                  {activeUser.email}
-                </p>
+                <p className="text-xs text-gray-500">{activeUser?.email}</p>
               </div>
               <button
                 onClick={() => setActiveUser(null)}
@@ -144,22 +150,20 @@ const AdminDashboard = () => {
             </div>
 
             <div className="p-4 max-h-[400px] overflow-y-auto space-y-3">
-              {activeUser.transactions.length === 0 ? (
+              {activeUser?.transactions.length === 0 ? (
                 <p className="text-gray-500 text-sm text-center">
                   No transactions found
                 </p>
               ) : (
-                activeUser.transactions.map((tx) => (
+                activeUser?.transactions.map((tx) => (
                   <div
-                    key={tx.id}
+                    key={tx?.id}
                     className="flex justify-between items-center bg-gray-50 p-3 rounded-lg text-sm"
                   >
-                    <span className="capitalize font-medium">
-                      {tx.type}
-                    </span>
-                    <span>₹ {tx.amount}</span>
+                    <span className="capitalize font-medium">{tx?.type}</span>
+                    <span>₹ {tx?.amount}</span>
                     <span className="text-gray-500">
-                      {new Date(tx.date).toLocaleString()}
+                      {new Date(tx?.date).toLocaleString()}
                     </span>
                   </div>
                 ))

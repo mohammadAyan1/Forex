@@ -190,6 +190,7 @@ const ForgetPassword = () => {
           <Link
             to="/login"
             className="text-crypto-purple hover:text-white transition"
+            target="_blank" rel="noopener noreferrer"
           >
             Sign in here
           </Link>

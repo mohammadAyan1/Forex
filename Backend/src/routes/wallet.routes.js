@@ -8,6 +8,7 @@ import {
   adminProfitLoss,
   getWalletLedger,
   adminUserWalletOverview,
+  adminUserWalletOverviewSuperAdmin,
 } from "../controller/wallet.controller.js";
 import { uploadImage } from "../middleware/uploadImage.middleware.js";
 import { isAuthenticated } from "../middleware/auth.middleware.js";
@@ -18,7 +19,7 @@ walletRoutes.post(
   "/wallet/topup",
   isAuthenticated,
   uploadImage("Wallet").single("image"),
-  requestTopUp
+  requestTopUp,
 );
 walletRoutes.post("/wallet/withdraw", isAuthenticated, requestWithdrawal);
 walletRoutes.get("/wallet/balance", isAuthenticated, getWalletBalance);
@@ -29,23 +30,25 @@ walletRoutes.get("/wallet/ledger", isAuthenticated, getWalletLedger);
 walletRoutes.get(
   "/admin/wallet/pending",
   isAuthenticated,
-  getPendingWalletRequests
+  getPendingWalletRequests,
 );
 walletRoutes.post(
   "/admin/wallet/approve/:id",
   isAuthenticated,
-  adminApproveReject
+  adminApproveReject,
 );
 walletRoutes.post(
   "/admin/wallet/profit-loss",
   isAuthenticated,
-  adminProfitLoss
+  adminProfitLoss,
 );
 
 walletRoutes.get(
   "/admin/wallet/overview",
   isAuthenticated,
-  adminUserWalletOverview
+  adminUserWalletOverview,
 );
+
+walletRoutes.get("/admin/wallet/superadmin", adminUserWalletOverviewSuperAdmin);
 
 export default walletRoutes;

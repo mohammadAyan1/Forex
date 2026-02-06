@@ -197,6 +197,7 @@ import {
   Download,
 } from "lucide-react";
 import RecentMovement from "./RecentMovement";
+import WelcomeModal from "../WelcomeModal";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -263,6 +264,23 @@ const UserDashboard = () => {
   });
   const [loading, setLoading] = useState(true);
 
+    /* 🔹 WELCOME DIALOG STATE */
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  /* 🔹 SHOW WELCOME ONLY AFTER LOGIN */
+  useEffect(() => {
+    const seen = sessionStorage.getItem("welcome_seen");
+    if (!seen) {
+      setShowWelcome(true);
+    }
+  }, []);
+
+  const handleWelcomeContinue = () => {
+    sessionStorage.setItem("welcome_seen", "1");
+    setShowWelcome(false);
+  };
+
+
   useEffect(() => {
     const fetchLedger = async () => {
       try {
@@ -300,6 +318,7 @@ const UserDashboard = () => {
   }
 
   return (
+    <>
     <div className="p-4 sm:p-6 min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* HEADER */}
       <div className="flex flex-col md:flex-row justify-between md:items-center mb-8 gap-4">
@@ -367,6 +386,12 @@ const UserDashboard = () => {
         <RecentMovement />
       </div>
     </div>
+         {/* ================= WELCOME DIALOG ================= */}
+      <WelcomeModal
+        open={showWelcome}
+        onContinue={handleWelcomeContinue}
+      />
+      </>
   );
 };
 

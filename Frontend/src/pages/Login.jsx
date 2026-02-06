@@ -12,46 +12,88 @@ const Login = () => {
 
   const navigate = useNavigate();
 
+  // const handleLogin = async () => {
+  //   try {
+  //     const response = await fetch(`${API_BASE_URL}/auth/login`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ email, password }),
+  //       credentials: "include", // ✅ for cookies
+  //     });
+
+  //     const result = await response.json();
+
+  //     // ❌ Login failed
+  //     if (!result.success) {
+  //       alert(result.message || "Invalid credentials");
+  //       return;
+  //     }
+
+  //     // ✅ Correct role access
+  //     const { role } = result.data;
+
+  //       // ✅ SAVE AUTH DATA (IMPORTANT)
+  //   localStorage.setItem("user", JSON.stringify(result.data));
+  //   localStorage.setItem("isLoggedIn", "true");
+
+    
+  //     // ✅ Role-based navigation
+  //     if (role === "admin") {
+  //       navigate("/admin/dashboard");
+  //     } else if (role === "user") {
+  //       navigate("/user/dashboard");
+  //     } else {
+  //       alert("Unauthorized role");
+  //     }
+  //   } catch (error) {
+  //     console.error("Login Error:", error);
+  //     alert("Something went wrong. Please try again.");
+  //   }
+  // };
+
   const handleLogin = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-        credentials: "include", // ✅ for cookies
-      });
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+      credentials: "include",
+    });
 
-      const result = await response.json();
+    const result = await response.json();
 
-      // ❌ Login failed
-      if (!result.success) {
-        alert(result.message || "Invalid credentials");
-        return;
-      }
+    if (!result.success) {
+      alert(result.message || "Invalid credentials");
+      return;
+    }
 
-      // ✅ Correct role access
-      const { role } = result.data;
+    const { role } = result.data;
 
-        // ✅ SAVE AUTH DATA (IMPORTANT)
+    // ✅ SAVE AUTH DATA
     localStorage.setItem("user", JSON.stringify(result.data));
     localStorage.setItem("isLoggedIn", "true");
 
-    
-      // ✅ Role-based navigation
-      if (role === "admin") {
-        navigate("/admin/dashboard");
-      } else if (role === "user") {
-        navigate("/user/dashboard");
-      } else {
-        alert("Unauthorized role");
-      }
-    } catch (error) {
-      console.error("Login Error:", error);
-      alert("Something went wrong. Please try again.");
+    // ✅ RESET WELCOME DIALOG (THIS IS THE KEY LINE)
+    sessionStorage.removeItem("welcome_seen");
+
+    // ✅ Role-based navigation
+    if (role === "admin") {
+      navigate("/admin/dashboard");
+    } else if (role === "user") {
+      navigate("/user/dashboard");
+    } else {
+      alert("Unauthorized role");
     }
-  };
+  } catch (error) {
+    console.error("Login Error:", error);
+    alert("Something went wrong. Please try again.");
+  }
+};
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-hero relative px-4">
@@ -96,6 +138,7 @@ const Login = () => {
           <Link
             to="/forgot-password"
             className="text-crypto-purple text-sm hover:text-white transition"
+            target="_blank" rel="noopener noreferrer"      
           >
             Forgot Password ?
           </Link>
@@ -113,6 +156,7 @@ const Login = () => {
           <Link
             to="/signup"
             className="text-crypto-purple hover:text-white transition"
+            target="_blank" rel="noopener noreferrer"
           >
             Sign up here
           </Link>

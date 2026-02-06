@@ -76,7 +76,7 @@ const Navbar = () => {
           </ul>
 
           <div className="hidden lg:flex items-center space-x-4">
-            <Link to="/login">
+            <Link to="/login" target="_blank" rel="noopener noreferrer">
               <button className="text-gray-300 bg-crypto-purple hover:bg-crypto-dark-purple py-1 px-3 rounded-lg hover:text-white">
                 Login
               </button>
