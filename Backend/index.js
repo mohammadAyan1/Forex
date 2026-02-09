@@ -9,10 +9,14 @@ import usersRoutes from "./src/routes/users.routes.js";
 import tradeRoutes from "./src/routes/trade.routes.js";
 import bankRoutes from "./src/routes/bank.routes.js";
 import cryptoRoutes from "./src/routes/crypto.routes.js";
-
+import path from "path";
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+
+// 🔥 REQUIRED FOR ES MODULE
+const __dirname = path.resolve();
 
 app.use(
   cors({
@@ -20,6 +24,7 @@ app.use(
       "http://localhost:5173",
       "https://frontend.akritiarchitectsandengineers.com",
       "https://forex-1-r2jk.onrender.com",
+      "https://www.tradebullforex.com"
     ], // frontend URL
     credentials: true, // allow cookies
     methods: ["GET", "POST", "PUT", "DELETE"],
@@ -45,6 +50,28 @@ app.use("/api/crypto", cryptoRoutes);
 
 ///!SECTION for image get
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
+// 🔥 SERVE FRONTEND
+app.use(
+  express.static(
+    path.join(__dirname, "../Frontend/dist")
+  )
+);
+
+
+// 🔥 CATCH-ALL (THIS FIXES 404 ON REFRESH)
+app.get("*", (req, res) => {
+  res.sendFile(
+    path.join(__dirname, "../Frontend/dist/index.html")
+  );
+});
+
+
+console.log(
+  "Frontend path:",
+  path.join(__dirname, "../Frontend/dist")
+);
+
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
